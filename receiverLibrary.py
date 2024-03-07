@@ -5,12 +5,12 @@ class Receiver:
     
     record_time = 100000 #in microseconds
     pin_number = None
-    captured_code = ''
+    captured_code = ""
     recordInput = [[],[]]
     expectedCodes = []
     code_length = 8
-    long_pause = 600
-    short_pause = 300
+    long_pause = 680
+    short_pause = 400
     upper_bound = 100
     lower_bound = 100
     
@@ -27,6 +27,9 @@ class Receiver:
     
     def listen(self):
         
+        self.recordInput = [[],[]]
+        self.captured_code = ""
+        
         total_time = 0
         start_time = time.ticks_us()
         
@@ -34,18 +37,16 @@ class Receiver:
         
         while total_time < self.record_time:
             
-            time_change = time.ticks_us() - start_time
+            time_change = time.ticks_diff(time.ticks_us(), start_time)
             self.recordInput[0].append(time_change)
             self.recordInput[1].append(self.get_value())
-            total_time = time_change
-        
+            total_time = time.ticks_diff(time.ticks_us(), start_time)
+
         #print('===ENDED RECORDING===')
-        
-    def get_input(self):
-        
+            
         first = 0
         second = 0
-        for i in range(len(arrTime[0])):
+        for i in range(len(self.recordInput[0])):
         
             if first == 0:
                 if self.recordInput[1][i] == 1:
@@ -57,41 +58,46 @@ class Receiver:
                 
             if first != 0 and second != 0:
                 x = self.recordInput[0][second] - self.recordInput[0][first]
+    
+                if x <= self.short_pause + self.upper_bound and x >= self.short_pause - self.lower_bound:
+                    self.captured_code += "1"
                 
-            if x <= self.short_pause + self.upper_bound and x >= self.short_pause - self.lower_bound:
-                self.captured_code += "1"
+                elif x <= self.long_pause + self.upper_bound and x >= self.long_pause - self.lower_bound:
+                    self.captured_code += "0"
+            
+                first = second
+                second = 0
                 
-            elif x <= self.long_pause + self.upper_bound and x >= self.long_pause - self.lower_bound:
-                self.captured_code += "0"
-            
-            first = second
-            second = 0
+        if len(self.recordInput[0]) > 0:     
+            print(self.captured_code)
         
-        read_message = ""
-        for i in range(0, len(self.captured_code) - self.code_length):
-            
-            for j in range(i, i + self.code_length):
-                read_message += captured_code[j]
-            
-            if len(read_message) == self.code_length:
-                for j in expectedCodes:
-                    if read_message == expectedCodes[j]:
-                        return j
-        
+        if len(self.recordInput[0]) > 0:
+            read_message = ""
+            for i in range(0, len(self.captured_code) - self.code_length):
+                
+                for j in range(i, i + self.code_length):
+                    read_message += self.captured_code[j]
+               
+                if len(read_message) == self.code_length:
+                    
+                    for j in range(len(self.expectedCodes)):
+                        if read_message == self.expectedCodes[j]:
+                            print('Code Found!')
+                            break
+                        read_message = ""
+                    
     def print_expected(self):
         
         length = len(expectedCodes)
         for i in range(length):
             print("#", i, "code:", expectedCodes[i])
     
-    def add_expectedCode(self, code):
+    def add_expected_code(self, code):
         
-        codeArray = []
-        for i in range(len(code)):
-            codeInt = int(code[i])
-            codeArray.append(codeInt)
+        new_expected = ''
+        new_expected = code
             
-        self.expectedCodes.append(codeArray)
+        self.expectedCodes.append(new_expected)
     
     def delete_expectedCodes(self):
         
@@ -119,3 +125,4 @@ class Receiver:
         return self.record_time
     
    
+
