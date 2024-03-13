@@ -3,7 +3,7 @@ import time
 
 class Receiver:
     
-    record_time = 100000 #in microseconds
+    record_time = 150000 #in microseconds
     pin_number = None
     captured_code = ""
     recordInput = [[],[]]
@@ -13,6 +13,9 @@ class Receiver:
     short_pause = 500
     upper_bound = 100
     lower_bound = 100
+    
+    found_code_var = -1
+    is_new_code = False
     
     def __init__(self, pin_number):
         self.pin = Pin(pin_number, Pin.IN, Pin.PULL_DOWN)
@@ -82,7 +85,8 @@ class Receiver:
                     
                     for j in range(len(self.expectedCodes)):
                         if read_message == self.expectedCodes[j]:
-                            print('Code Found!')
+                            print('Code Found at index:', j)
+                            self.found_code(j)
                             break
                         read_message = ""
                     
@@ -91,6 +95,15 @@ class Receiver:
         length = len(expectedCodes)
         for i in range(length):
             print("#", i, "code:", expectedCodes[i])
+        
+    def found_code(self, index):
+        
+            self.is_new_code = True
+            self.found_code_var = index
+            
+    def get_code(self):
+            
+        return self.expectedCodes[self.found_code_var]
     
     def add_expected(self, code):
         
@@ -124,7 +137,7 @@ class Receiver:
     def get_record_time(self):
         return self.record_time
     
-     def set_record_time(self, time):
+    def set_record_time(self, time):
         self.record_time = time
     
    
