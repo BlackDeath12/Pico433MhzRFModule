@@ -9,8 +9,8 @@ class Receiver:
     recordInput = [[],[]]
     expectedCodes = []
     code_length = 8
-    long_pause = 680
-    short_pause = 400
+    long_pause = 1000
+    short_pause = 500
     upper_bound = 100
     lower_bound = 100
     
@@ -33,16 +33,16 @@ class Receiver:
         total_time = 0
         start_time = time.ticks_us()
         
-        #print('===STARTED RECORDING===')
+        #===STARTED RECORDING===
         
         while total_time < self.record_time:
             
             time_change = time.ticks_diff(time.ticks_us(), start_time)
             self.recordInput[0].append(time_change)
             self.recordInput[1].append(self.get_value())
-            total_time = time.ticks_diff(time.ticks_us(), start_time)
+            total_time = time_change
 
-        #print('===ENDED RECORDING===')
+        #===ENDED RECORDING===
             
         first = 0
         second = 0
@@ -92,14 +92,14 @@ class Receiver:
         for i in range(length):
             print("#", i, "code:", expectedCodes[i])
     
-    def add_expected_code(self, code):
+    def add_expected(self, code):
         
         new_expected = ''
         new_expected = code
             
         self.expectedCodes.append(new_expected)
     
-    def delete_expectedCodes(self):
+    def delete_expected(self):
         
         self.expetedCodes.clear()
     
@@ -123,6 +123,9 @@ class Receiver:
     
     def get_record_time(self):
         return self.record_time
+    
+     def set_record_time(self, time):
+        self.record_time = time
     
    
 
