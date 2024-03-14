@@ -1,5 +1,6 @@
 from machine import Pin
 import time
+import _thread
 
 class Receiver:
     
@@ -9,12 +10,12 @@ class Receiver:
     recordInput = [[],[]]
     expectedCodes = []
     code_length = 8
-    long_pause = 1000
-    short_pause = 500
-    upper_bound = 100
-    lower_bound = 100
+    long_pause = 2000
+    short_pause = 800
+    upper_bound = 250
+    lower_bound = 250
     
-    found_code_var = -1
+    found_code_var = []
     is_new_code = False
     
     def __init__(self, pin_number):
@@ -47,20 +48,25 @@ class Receiver:
 
         #===ENDED RECORDING===
             
-        first = 0
-        second = 0
-        for i in range(len(self.recordInput[0])):
+        arr = self.recordInput.copy()
+#         t1 = _thread.start_new_thread(self.get_input, (arr[0], arr[1]))
+        self.get_input(arr[0], arr[1])
         
-            if first == 0:
-                if self.recordInput[1][i] == 1:
+    def get_input(self, arr1, arr2):
+        first = -1
+        second = -1
+        for i in range(len(arr1)):
+        
+            if first == -1:
+                if arr2[i] == 0:
                     first = i
                 
-            elif first != 0:
-                if self.recordInput[1][i] == 1:
+            else:
+                if arr2[i] == 1 and arr2[i - 1] == 0:
                     second = i
                 
-            if first != 0 and second != 0:
-                x = self.recordInput[0][second] - self.recordInput[0][first]
+            if first != -1 and second != -1:
+                x = arr1[second] - arr1[first]
     
                 if x <= self.short_pause + self.upper_bound and x >= self.short_pause - self.lower_bound:
                     self.captured_code += "1"
@@ -68,13 +74,13 @@ class Receiver:
                 elif x <= self.long_pause + self.upper_bound and x >= self.long_pause - self.lower_bound:
                     self.captured_code += "0"
             
-                first = second
-                second = 0
+                first = -1
+                second = -1
                 
-        if len(self.recordInput[0]) > 0:     
+        if len(arr1) > 0:     
             print(self.captured_code)
         
-        if len(self.recordInput[0]) > 0:
+        if len(arr1) > 0:
             read_message = ""
             for i in range(0, len(self.captured_code) - self.code_length):
                 
@@ -85,32 +91,29 @@ class Receiver:
                     
                     for j in range(len(self.expectedCodes)):
                         if read_message == self.expectedCodes[j]:
-                            print('Code Found at index:', j)
+                            print('Code at Index:', j, 'Found!')
                             self.found_code(j)
                             break
                         read_message = ""
                     
     def print_expected(self):
         
-        length = len(expectedCodes)
+        length = len(self.expectedCodes)
         for i in range(length):
-            print("#", i, "code:", expectedCodes[i])
+            print("#", i, "code:", self.expectedCodes[i])
         
     def found_code(self, index):
         
             self.is_new_code = True
-            self.found_code_var = index
+            self.found_code_var.append(index)
             
     def get_code(self):
             
-        return self.expectedCodes[self.found_code_var]
+        return self.expectedCodes[self.found_code_var.pop(0)]
     
     def add_expected(self, code):
         
-        new_expected = ''
-        new_expected = code
-            
-        self.expectedCodes.append(new_expected)
+        self.expectedCodes.append(code)
     
     def delete_expected(self):
         
@@ -141,4 +144,5 @@ class Receiver:
         self.record_time = time
     
    
+
 
