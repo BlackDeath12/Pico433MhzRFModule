@@ -13,7 +13,7 @@ class Receiver:
     long_pause = 2000
     short_pause = 800
     upper_bound = 250
-    lower_bound = 250
+    lower_bound = 100
     
     found_code_var = []
     is_new_code = False
@@ -49,7 +49,6 @@ class Receiver:
         #===ENDED RECORDING===
             
         arr = self.recordInput.copy()
-#         t1 = _thread.start_new_thread(self.get_input, (arr[0], arr[1]))
         self.get_input(arr[0], arr[1])
         
     def get_input(self, arr1, arr2):
@@ -86,16 +85,16 @@ class Receiver:
                 
                 for j in range(i, i + self.code_length):
                     read_message += self.captured_code[j]
-               
+                
                 if len(read_message) == self.code_length:
                     
-                    for j in range(len(self.expectedCodes)):
-                        if read_message == self.expectedCodes[j]:
-                            print('Code at Index:', j, 'Found!')
-                            self.found_code(j)
-                            break
-                        read_message = ""
-                    
+                    for l in range(len(self.expectedCodes)):
+                        if read_message == self.expectedCodes[l]:
+                            print('Code at Index:', l, 'Found!')
+                            self.found_code(l)
+                            read_message = ""
+                            
+                    read_message = ""
     def print_expected(self):
         
         length = len(self.expectedCodes)
@@ -104,12 +103,19 @@ class Receiver:
         
     def found_code(self, index):
         
-            self.is_new_code = True
             self.found_code_var.append(index)
             
     def get_code(self):
+        
+        if len(self.found_code_var) > 0:
+        
+            return self.expectedCodes[self.found_code_var.pop(0)]
+        
+    def get_index(self):
+        
+        if len(self.found_code_var) > 0:
             
-        return self.expectedCodes[self.found_code_var.pop(0)]
+            return self.found_code_var.pop(0)
     
     def add_expected(self, code):
         
