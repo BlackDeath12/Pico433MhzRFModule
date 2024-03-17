@@ -47,7 +47,7 @@ rcv.get_code()
 
 The library can read up to 24-bit-long messages at a time. By default, the library is set to read messages 8-bits long. You can change this by using:
 ```python
-rcv.code_length = 16
+rcv.set_code_length(16)
 ```
 Be sure that the codes you add through the add_expected() function are the same size as code_length(), you can see the current code_length by using
 ```python
