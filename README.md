@@ -3,8 +3,6 @@ v.1.1
 
 This library is intended for use in a Raspberry Pi Pico microcontroller to handle digital signals from a 433 MHz radio module. You can find this module on [Amazon](https://www.amazon.com/HiLetgo-Wireless-Transmitter-Receiver-Raspberry/dp/B01DKC2EY4/ref=sr_1_3?dib=eyJ2IjoiMSJ9.tNlJbSBQOEL92GF5uwdw_3SL16TQy5q53ghPMyP1cHEsrLxGHSv_Hrk051zSYoIKOV3SQOxT8WlPG1fWqBXTT2qJziGxOrVbRX8AA7w0lYnlZSmpK8G69bdIipY7qC98s63Tp4Auc2GXPUjxvkEA17zSVrBe0Hu2DsSEkeMOCp1ocImWadqcHmnRnU0TwXfq4_TeJ5_5FVu8ZNVvSN_ARLaKOvYZicok_mjMqcb6nTQ.SDqOOcts__5t69TnLcj5LbM_DOp22w5x4iSZq723qCQ&dib_tag=se&keywords=433mhz+receiver&qid=1710655441&sr=8-3). This module is perfect for simple short-range communication, whether it is to control your room LEDs or disable an alarm system. This module is cheap and easy to use. 
 
-I created this library because, after some research, I couldn't find any other existing radio library that worked for Micropython (Raspberry Pi Pico's coding language). Therefore, I decided to make this library. 
-
 ## What the library does: 
 
 This library receives a radio signal through the RF module and turns it into binary for your Raspberry Pi Pico. The algorithm is based on the Manchester code, a data transfer protocol that turns low and high-voltage signals to binary based on the length of the signal.
@@ -78,4 +76,10 @@ The input recorded can be graphed as the following:
 
 ![Image](RFmoduleInput.png)
 
-Here you can visualize how the input looks over time. In the time frame to the left, you can see an example of a long pause, which is about 2000 microseconds long. To the right, you can see an example of a short pause, which is about 800 microseconds long. Remember that the library only measures the time when the input is equal to 0, so the duration of the high input signals is not relevant as long as it is long enough to be detected by the program. 
+Here you can visualize how the input looks over time. In the time frame to the left, you can see an example of a long pause, which is about 2000 microseconds long. To the right, you can see an example of a short pause, which is about 800 microseconds long.
+
+Remember that the library only measures the time when the input is equal to 0, so the duration of the high input signals is not relevant as long as it is long enough to be detected by the program. 
+
+Therefore, in other words, we can simply interpret short and long gaps as a sequence of 1s and 0s respectively:
+
+![Image](RFmoduleBinary.jpg)
