@@ -64,3 +64,10 @@ rcv.set_short_pause(value)
 
 rcv.set_long_pause(value)
 ```
+
+The library records the input for 1.5 seconds before processing it. You can change how long the recording lasts by using:
+```python
+#Time must be in microseconds
+rcv.set_record_time(time)
+```
+Be aware that a time that's too long will return memory allocation errors while a time that's too short will not allow enough time to capture a message that's multiple bits long.
