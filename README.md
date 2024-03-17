@@ -54,7 +54,8 @@ Be sure that the codes you add through the add_expected() function are the same 
 print(rcv.get_code_length())
 ```
 
-##How the library works:
+## How the library works:
+
 The library measures the time between high voltage inputs sent by the RF whenever it detects a 433 MHz frequency. In other words, it measures how long the RF module doesn't receive any signal and turns it into binary depending on how long the lack of signal lasts. This has some advantages since you can send a very short signal and only worry about the time between the current and the next signal. Similar to Morse code. By default, the library expects a gap of 800 microseconds to represent a 1 and a gap of 2000 microseconds to represent a 0, but you can change it to any number you'd like as long as it is above 300 microseconds. Lower values have the chance to not be picked up. 
 You can change these values by using:
 ```python
