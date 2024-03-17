@@ -73,3 +73,9 @@ The library records the input for 1.5 seconds before processing it. You can chan
 rcv.set_record_time(time)
 ```
 Be aware that a time that's too long will return memory allocation errors while a time that's too short will not allow enough time to capture a message that's multiple bits long.
+
+The input recorded can be graphed as the following:
+
+![Image](RFmoduleInput.png)
+
+Here you can visualize how the input looks over time. In the time frame to the left, you can see an example of a long pause, which is about 2000 microseconds long. To the right, you can see an example of a short pause, which is about 800 microseconds long. Remember that the library only measures the time when the input is equal to 0, so the duration of the high input signals is not relevant as long as it is long enough to be detected by the program. 
