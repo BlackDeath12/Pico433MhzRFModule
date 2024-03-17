@@ -11,6 +11,7 @@ This library receives a radio signal through the RF module and turns it into bin
 After receiving a signal from the RF module, the library translates the signal into binary code and returns if that code was expected. 
 
 ## How to use the library:
+First, download the receiverLibrary.py file and import it into your code.
 
 ```python
 from machine import Pin
