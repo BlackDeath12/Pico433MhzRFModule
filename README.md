@@ -1,85 +1,71 @@
-# ReceiverLibrary
-v.1.1
+# Pico 433Mhz RF Module Library
+v.2.0
 
-This library is intended for use in a Raspberry Pi Pico microcontroller to handle digital signals from a 433 MHz radio module. You can find this module on [Amazon](https://www.amazon.com/HiLetgo-Wireless-Transmitter-Receiver-Raspberry/dp/B01DKC2EY4/ref=sr_1_3?dib=eyJ2IjoiMSJ9.tNlJbSBQOEL92GF5uwdw_3SL16TQy5q53ghPMyP1cHEsrLxGHSv_Hrk051zSYoIKOV3SQOxT8WlPG1fWqBXTT2qJziGxOrVbRX8AA7w0lYnlZSmpK8G69bdIipY7qC98s63Tp4Auc2GXPUjxvkEA17zSVrBe0Hu2DsSEkeMOCp1ocImWadqcHmnRnU0TwXfq4_TeJ5_5FVu8ZNVvSN_ARLaKOvYZicok_mjMqcb6nTQ.SDqOOcts__5t69TnLcj5LbM_DOp22w5x4iSZq723qCQ&dib_tag=se&keywords=433mhz+receiver&qid=1710655441&sr=8-3). This module is perfect for simple short-range communication, whether it is to control your room LEDs or disable an alarm system. This module is cheap and easy to use. 
+This library is intended for use in a Raspberry Pi Pico microcontroller to handle digital signals from a 433 Mhz rf module. You can find this module on [Amazon](https://www.amazon.com/HiLetgo-Wireless-Transmitter-Receiver-Raspberry/dp/B01DKC2EY4/ref=sr_1_3?dib=eyJ2IjoiMSJ9.tNlJbSBQOEL92GF5uwdw_3SL16TQy5q53ghPMyP1cHEsrLxGHSv_Hrk051zSYoIKOV3SQOxT8WlPG1fWqBXTT2qJziGxOrVbRX8AA7w0lYnlZSmpK8G69bdIipY7qC98s63Tp4Auc2GXPUjxvkEA17zSVrBe0Hu2DsSEkeMOCp1ocImWadqcHmnRnU0TwXfq4_TeJ5_5FVu8ZNVvSN_ARLaKOvYZicok_mjMqcb6nTQ.SDqOOcts__5t69TnLcj5LbM_DOp22w5x4iSZq723qCQ&dib_tag=se&keywords=433mhz+receiver&qid=1710655441&sr=8-3). This module is perfect for simple short-range communication, whether it is to control your room LEDs or disable an alarm system. This module is cheap and easy to use. 
+
+Resources: this library was developed with the help of [robwlakes](https://github.com/robwlakes/ArduinoWeatherOS)'s repository. They also explain in full detail how Manchester Encoding works, so I recommend giving a look to their repository. 
 
 ## What the library does: 
 
-This library receives a radio signal through the RF module and turns it into binary for your Raspberry Pi Pico. The algorithm is based on the Manchester code, a data transfer protocol that turns low and high-voltage signals to binary based on the length of the signal.
-After receiving a signal from the RF module, the library translates the signal into binary code and returns if that code was expected. 
+This library handles radio-frequency communication using Manchester Encoding. The library contains two classes, one for the receiver and one for the transmitter. Currently, the receiver can read up to 125 bytes per second, which is expected to increase with some future optimizations. Both the receiver and transmitter can use Manchester Encoding as per G.E Thomas or IEEE convention(more about this below). All data transmission is treated as sending packages, which uses a simple framing of a header/preamble, a package size flag, and the payload. Overall, this is an easy way to send and receive information in your Raspberry Pi Pico project through radio-frequency. 
 
-## How to use the library:
-First, download the receiverLibrary.py file and import it into your code.
+## Quick-start Guide:
+First, download the Pico433Lib.py file and import it into your pico.
 
+### For the receiver: 
 ```python
 from machine import Pin
-from receiverLibrary import receiver
+from Pico433Lib import Rx
 
-#For this function, use the pin you have your RF module connected to as an argument, in this example, I'm using GPIO pin 13.
-rcv.receiver(13)
+#The header is a sequence of bits that the receiver expects before the payload. You can make the header any binary sequence as long as it starts with a one. I recommend to keep it at least 6 bits long. 
+header = [1,1,1,1,1,1,1,1]
 
-#This function saves an expected code as a string to an array starting from index 0. (Be careful not to use codes that are a mirror of each other)
-rcv.add_expected('01101010')
-rcv.add_expected('10011101')
+#For this function, use the pin you have your RF module output connected to as the first argument, in this example I'm using GPIO pin 13. For the second argument, choose either 0 or 1 to use the original Manchester Encoding or as per IEEE convention(more about this below) respectively. For the third argument, use the header array.
+rx = Rx(13, 0, header)
+
+#Note: For the receiver linked above, you'll need to connect the voltage directly into the VSYS pin of your pico as it requires 5v. If you have a receiver that works with 3v then you can use any other GPIO pin. 
 
 #For this example, I'm going to use the LED that comes integrated into your Raspberry Pi Pico
 led = Pin(25, Pin.OUT)
 
 while True:
 
-  #This function starts recording the input from the RF module to translate it into binary. 
-  rcv.listen()
+  rx.listen()
 
-  #The get_index() function returns, in order, the index of the codes received. The index is determined by the order you saved the expected codes through the add_expected() function. 
-  if rcv.get_index() == 0:
-    #Code 01101010 turns the LED off
-    led.value(0)
-  elif rcv.get_index() == 1:
-    #Code 10011101 turns the LED on
-    led.value(1)
+  if rx.get_latest() == "48656c6c6f20576f726c6421": # rx.get_latest() gets the last message received, it is returned as a hexadecimal string. In this case, the string translates to "Hello World!"
+    led.toggle()
+
+    rx.erase_latest()
 
 ```
-Alternatively to get_index(), you can use get_code() to get the whole string representing the code instead of just its index.
+
+By default, the receiver class stores the last 5 messages received. You can change this by using the function:
+```python 
+set_max_storage(number_of_messages)
+``` 
+
+In addition, the receiver class prints to the console each byte received as a character. 
+
+### For the transmitter:
 ```python
-rcv.get_code()
+from machine import Pin
+from Pico433Lib import Tx
+
+header = [1,1,1,1,1,1,1,1]
+
+#Pin connected to the voltage of your transmitter.
+tx_power = Pin(18, Pin.OUT)
+tx_power.value(1)
+
+#Just like the receiver, use the pin you have connected to the input of your transmitter as the first argument. The second parameter is the type of encoding. The third parameter is for the header. 
+#Make sure you're using the same header for the transmitter and receiver!
+tx = Tx(19, 0, header)
+
+message = "Hello World!"
+
+tx.send_message(message)
+
 ```
 
-The library can read up to 24-bit-long messages at a time. By default, the library is set to read messages 8-bits long. You can change this by using:
-```python
-rcv.set_code_length(16)
-```
-Be sure that the codes you add through the add_expected() function are the same size as code_length(), you can see the current code_length by using:
-```python
-print(rcv.get_code_length())
-```
+Instructions on how to assemble the transmitter and receiver comming soon...
 
-## How the library works:
-
-The library measures the time between high voltage inputs sent by the RF whenever it detects a 433 MHz frequency. In other words, it measures how long the RF module doesn't receive any signal and turns it into binary depending on how long the lack of signal lasts. This has some advantages since you can send a very short signal and only worry about the time between the current and the next signal. Similar to Morse code. By default, the library expects a gap of 800 microseconds to represent a 1 and a gap of 2000 microseconds to represent a 0, but you can change it to any number you'd like as long as it is above 300 microseconds. Lower values have the chance to not be picked up. 
-
-You can change these values by using:
-```python
-#Value must be in microseconds
-rcv.set_short_pause(value)
-
-rcv.set_long_pause(value)
-```
-
-The library records the input for 1.5 seconds before processing it. You can change how long the recording lasts by using:
-```python
-#Time must be in microseconds
-rcv.set_record_time(time)
-```
-Be aware that a time that's too long will return memory allocation errors while a time that's too short will not allow enough time to capture a message that's multiple bits long.
-
-The input recorded can be graphed as the following:
-
-![Image](RFmoduleInput.png)
-
-Here you can visualize how the input looks over time. In the time frame to the left, you can see an example of a long pause, which is about 2000 microseconds long. To the right, you can see an example of a short pause, which is about 800 microseconds long.
-
-Remember that the library only measures the time when the input is equal to 0, so the duration of the high input signals is not relevant as long as it is long enough to be detected by the program. 
-
-Therefore, in other words, we can simply interpret short and long gaps as a sequence of 1s and 0s respectively:
-
-![Image](RFmoduleBinary.jpg)
