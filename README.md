@@ -66,6 +66,22 @@ message = "Hello World!"
 tx.send_message(message)
 
 ```
+### General information
+
+You can change the transmission/reception rate by using:
+```python
+rx.set_bit_time(time_in_microseconds)
+tx.set_bit_time(time_in_microseconds)
+```
+This modifies the bits per second sent/received. The fastest reception rate possible so far is one bit every 1000 microseconds, so only use numbers greater than or equal to 1000 in this method. 
+Keep in mind that the transmitter and receiver must be set at the same rate for data transmission to work correctly. By default, both are set to 1000 microseconds for every bit. 
+
+If you want to access the messages received, you can do so through the `data` attribute of the Rx class. The `data` attribute is a 2D array. The latest message is stored at the last index of the `data` array. 
+
+```python
+rx.data[0] #This gets the oldest message stored
+rx.data[len(rx.data) - 1] #This gets the latest message received
+```
 
 ## How To Assemble
 
