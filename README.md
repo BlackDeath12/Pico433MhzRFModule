@@ -1,23 +1,23 @@
 # Pico 433Mhz RF Module Library
 v.2.0
 
-This library is intended for use in a Raspberry Pi Pico microcontroller to handle digital signals from a 433 Mhz rf module. You can find this module on [Amazon](https://www.amazon.com/HiLetgo-Wireless-Transmitter-Receiver-Raspberry/dp/B01DKC2EY4/ref=sr_1_3?dib=eyJ2IjoiMSJ9.tNlJbSBQOEL92GF5uwdw_3SL16TQy5q53ghPMyP1cHEsrLxGHSv_Hrk051zSYoIKOV3SQOxT8WlPG1fWqBXTT2qJziGxOrVbRX8AA7w0lYnlZSmpK8G69bdIipY7qC98s63Tp4Auc2GXPUjxvkEA17zSVrBe0Hu2DsSEkeMOCp1ocImWadqcHmnRnU0TwXfq4_TeJ5_5FVu8ZNVvSN_ARLaKOvYZicok_mjMqcb6nTQ.SDqOOcts__5t69TnLcj5LbM_DOp22w5x4iSZq723qCQ&dib_tag=se&keywords=433mhz+receiver&qid=1710655441&sr=8-3). This module is perfect for simple short-range communication, whether it is to control your room LEDs or disable an alarm system. This module is cheap and easy to use. 
+This library is intended for use in a Raspberry Pi Pico microcontroller to handle digital signals from a 433 Mhz RF module. You can find this module on [Amazon](https://www.amazon.com/HiLetgo-Wireless-Transmitter-Receiver-Raspberry/dp/B01DKC2EY4/ref=sr_1_3?dib=eyJ2IjoiMSJ9.tNlJbSBQOEL92GF5uwdw_3SL16TQy5q53ghPMyP1cHEsrLxGHSv_Hrk051zSYoIKOV3SQOxT8WlPG1fWqBXTT2qJziGxOrVbRX8AA7w0lYnlZSmpK8G69bdIipY7qC98s63Tp4Auc2GXPUjxvkEA17zSVrBe0Hu2DsSEkeMOCp1ocImWadqcHmnRnU0TwXfq4_TeJ5_5FVu8ZNVvSN_ARLaKOvYZicok_mjMqcb6nTQ.SDqOOcts__5t69TnLcj5LbM_DOp22w5x4iSZq723qCQ&dib_tag=se&keywords=433mhz+receiver&qid=1710655441&sr=8-3). This module is perfect for simple short-range communication, whether it is to control your room LEDs or disable an alarm system. This module is cheap and easy to use. 
 
-Resources: this library was developed with the help of [robwlakes](https://github.com/robwlakes/ArduinoWeatherOS)'s repository. They also explain in full detail how Manchester Encoding works, so I recommend giving a look to their repository. 
+Resources: this library was developed with the help of [robwlakes](https://github.com/robwlakes/ArduinoWeatherOS)'s repository. They also explain in full detail how Manchester Encoding works, so I recommend giving a visit to their repository. 
 
 ## What the library does: 
 
-This library handles radio-frequency communication using Manchester Encoding. The library contains two classes, one for the receiver and one for the transmitter. Currently, the receiver can read up to 125 bytes per second, which is expected to increase with some future optimizations. Both the receiver and transmitter can use Manchester Encoding as per G.E Thomas or IEEE convention(more about this below). All data transmission is treated as sending packages, which uses a simple framing of a header/preamble, a package size flag, and the payload. Overall, this is an easy way to send and receive information in your Raspberry Pi Pico project through radio-frequency. 
+This library handles radio frequency communication using Manchester Encoding. The library contains two classes, one for the receiver and one for the transmitter. Currently, the receiver can read up to 125 bytes per second, which is expected to increase with some future optimizations. Both the receiver and transmitter can use Manchester Encoding as per G.E Thomas or IEEE convention(more about this below). All data transmission is treated as sending packages, which uses a simple framing of a header/preamble, a package size flag, and the payload. Overall, this is an easy way to send and receive information in your Raspberry Pi Pico project through radio frequency. 
 
 ## Quick-start Guide:
-First, download the Pico433Lib.py file and import it into your pico.
+First, download the Pico433Lib.py file and import it into your Pico.
 
 ### For the receiver: 
 ```python
 from machine import Pin
 from Pico433Lib import Rx
 
-#The header is a sequence of bits that the receiver expects before the payload. You can make the header any binary sequence as long as it starts with a one. I recommend to keep it at least 6 bits long. 
+#The header is a sequence of bits the receiver expects before the payload. You can make the header any binary sequence as long as it starts with a one. I recommend keeping it at least 6 bits long. 
 header = [1,1,1,1,1,1,1,1]
 
 #For this function, use the pin you have your RF module output connected to as the first argument, in this example I'm using GPIO pin 13. For the second argument, choose either 0 or 1 to use the original Manchester Encoding or as per IEEE convention(more about this below) respectively. For the third argument, use the header array.
@@ -67,5 +67,27 @@ tx.send_message(message)
 
 ```
 
-Instructions on how to assemble the transmitter and receiver comming soon...
+## How To Assemble
 
+What you need:
+6 Jumper wires
+1 Receiver
+1 Transmitter
+1 Raspberry Pi Pico
+1 Micro-USB cable
+1 Breadboard (optional)
+
+### Receiver: 
+![Image of a 433Mhz rf receiver](pics/rx)
+Sometimes the receiver module will come with a pre-attached antenna but if it doesn't you can make your own using a cable. It is recommended that the length of the antenna is a quarter of the wavelength, so about 17.3cm. 
+
+Then, connect the VCC pin of the receiver to the VBUS pin of your Pico as the receiver requires a minimum of 5v, one of the data pins of the receiver to a GPIO pin (in this example I'm using GPIO pin 13), and the ground pin of the receiver to any ground pin of your Pico (all the squared pins in your Pico are ground pins). 
+![Image of Pico with receiver](pics/pico_with_rx)
+
+### Transmitter:
+
+![Image of a 433Mhz RF transmitter](pics/tx)
+As with the receiver, the transmitter may come with a pre-attached antenna. But if it doesn't, you can attach your own. 
+
+Connect the VCC and data pins of the transmitter to any GPIO pins (I'm using GPIO pins 18 and 19), and the ground pin of the transmitter to any squared pin of your Pico. The VCC pin is used to power the module while the data pin will be used to send the RF signals.
+![Image of Pico with transmitter](pics/pico_with_tx)
