@@ -91,3 +91,6 @@ As with the receiver, the transmitter may come with a pre-attached antenna. But 
 
 Connect the VCC and data pins of the transmitter to any GPIO pins (I'm using GPIO pins 18 and 19), and the ground pin of the transmitter to any squared pin of your Pico. The VCC pin is used to power the module while the data pin will be used to send the RF signals.
 ![Image of Pico with transmitter](pics/pico_with_tx.jpeg)
+
+You can also use the receiver and the transmitter on the same Pico. 
+![Image of Pico with tx and rx](pics/pico_with_tx_rx.jpeg)
