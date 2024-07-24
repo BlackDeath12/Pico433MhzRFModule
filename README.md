@@ -78,16 +78,16 @@ What you need:
 1 Breadboard (optional)
 
 ### Receiver: 
-![Image of a 433Mhz rf receiver](pics/rx)
+![Image of a 433Mhz rf receiver](pics/rx.jpeg)
 Sometimes the receiver module will come with a pre-attached antenna but if it doesn't you can make your own using a cable. It is recommended that the length of the antenna is a quarter of the wavelength, so about 17.3cm. 
 
 Then, connect the VCC pin of the receiver to the VBUS pin of your Pico as the receiver requires a minimum of 5v, one of the data pins of the receiver to a GPIO pin (in this example I'm using GPIO pin 13), and the ground pin of the receiver to any ground pin of your Pico (all the squared pins in your Pico are ground pins). 
-![Image of Pico with receiver](pics/pico_with_rx)
+![Image of Pico with receiver](pics/pico_with_rx.jpeg)
 
 ### Transmitter:
 
-![Image of a 433Mhz RF transmitter](pics/tx)
+![Image of a 433Mhz RF transmitter](pics/tx.jpeg)
 As with the receiver, the transmitter may come with a pre-attached antenna. But if it doesn't, you can attach your own. 
 
 Connect the VCC and data pins of the transmitter to any GPIO pins (I'm using GPIO pins 18 and 19), and the ground pin of the transmitter to any squared pin of your Pico. The VCC pin is used to power the module while the data pin will be used to send the RF signals.
-![Image of Pico with transmitter](pics/pico_with_tx)
+![Image of Pico with transmitter](pics/pico_with_tx.jpeg)
